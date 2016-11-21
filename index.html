@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="//d3js.org/d3.v3.min.js"></script>
+        <style>
+            body {
+              font: 12px sans-serif;
+              width: 800px;
+            }
+
+            .axis path,
+            .axis line {
+              fill: none;
+              stroke: #000;
+              shape-rendering: crispEdges;
+            }
+
+            .bar {
+              fill: SteelBlue;
+            }
+
+            .y.axis path {
+              display: none;
+            }
+
+            .x.axis path {
+              display: none;
+            }
+
+            .legend line {
+              stroke: #000;
+              shape-rendering: crispEdges;
+            }
+            h2, h3, h4 {
+              margin: 2px;
+              padding-left: 100px;
+            }
+
+            svg {
+              margin: 5px;
+            }
+            h5,a {
+              padding-left: 20px;
+            }
+
+            p {
+              font-size: 16px;
+              padding-left: 100px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <script> 
+            var margin = {top: 10, right: 400, bottom: 30, left: 200},
+                width = 1060 - margin.left - margin.right,
+                height = 1000 - margin.top - margin.bottom;
+
+            d3.select("body")
+              .append("h2")
+              .text("Student Performance in Mathematics");
+
+            d3.select("body")
+              .append("br");
+
+            d3.select("body")
+              .append("p")
+              .text("OECD Program for International Student Assessment (PISA) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students. With mathematics as its primary focus, the PISA 2012 assessment measured 15-year-olds’ capacity to reason mathematically and use mathematical concepts, procedures, facts and tools to describe, explain and predict phenomena. Around 510 000 students between the ages of 15 years 3 months and 16 years 2 months completed the assessment in 2012, representing about 28 million 15-year-olds in the schools of the 65 participating countries and economies, more than 80% of the world economy.");
+
+            d3.select("body")
+              .append("br");   
+
+            d3.select("body")
+                .append("h3")
+                .text("Percentage of students at each level of mathematics proficiency, OECD, PISA 2012 Database");
+
+            var y = d3.scale.ordinal()
+              .rangeRoundBands([0, height], .1);
+
+
+            var x = d3.scale.linear()
+              .rangeRound([0,width]);
+
+            var color = d3.scale.ordinal()
+              .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+            var yAxis = d3.svg.axis()
+              .scale(y)
+              .orient("left");
+
+            var xAxis = d3.svg.axis()
+              .scale(x)
+              .orient("bottom")
+              .tickFormat(d3.format(".0%"));
+                
+            var svg = d3.select("body").append("svg")
+              .attr("width", width + margin.left + margin.right)
+              .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            /*
+            Use D3 to load the CSV file and use data to calculate x, y values needed to create the chart 
+            */
+    
+            d3.csv("MS12student_data_v2.csv", function(error, data) {
+              if (error) throw error;
+
+              // keys - column names
+              color.domain(d3.keys(data[0]).filter(function(key) { return key !== "Country" && key !== "Average Score"; }));
+
+              data.forEach(function(d) {
+                var x0 = 0;
+                d.levels = color.domain().map(function(name) { return {name: name, x0: x0, x1: x0 += +d[name]}; });
+                d.levels.forEach(function(d) { d.x0 /= x0; d.x1 /= x0; });
+              });
+
+              data.sort(function(a, b) { return b["Average Score"] - a["Average Score"]; });
+
+              
+
+              // Finding the overall average score to draw the line on the chart
+              var total_score = 0;
+              var num_of_countries = 0;
+              var country_above_ave = "";
+              var index_ave = 0;
+              
+              data.forEach(function(d) {
+                total_score += +d["Average Score"];
+                num_of_countries += 1;
+              })
+
+              var OECD_score = total_score/num_of_countries;
+
+              // Finding the country with a score closest to the average to get the y coordinate for the 
+              // overall line position
+              data.forEach(function(d) {       
+                if (+d["Average Score"] > OECD_score) {
+                  country_above_ave =  d["Country"];
+                }  
+                if (d.Country == country_above_ave) {
+                  index_ave = data.indexOf(d);
+                }           
+              });
+
+              y.domain(data.map(function(d) {
+                return d.Country; }));
+            
+              svg.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(0,0)")
+                .call(yAxis);
+
+              svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+                
+              var country = svg.selectAll(".country")
+                .data(data)
+                .enter().append("g")
+                .attr("class", "country")
+                .attr("transform", function(d) {
+                  return "translate(0," + y(d.Country) + ")";
+                })
+                .on("mouseover", function(d){ 
+                  d3.select(this).append("rect:title")
+                    .text(function(d) {
+                      var level1_b = "Below level 1: " + d["Below Level 1"]
+                      var level1 = "Level 1: " + d["Level 1"]
+                      var level2 = "Level 2: " + d["Level 2"]
+                      var level3 = "Level 3: " + d["Level 3"]
+                      var level4 = "Level 4: " + d["Level 4"]
+                      var level5 = "Level 5: " + d["Level 5"]
+                      var level6 = "Level 6: " + d["Level 6"]
+                      var ave = "Average score: " + Math.floor( d["Average Score"])
+                      
+                      return d.Country + "\n" +
+                        "Number of students: " + "\n" +
+                        level1_b + "\n" +
+                        level1 + "\n" +
+                        level2 + "\n" +
+                        level3 + "\n" +
+                        level4 + "\n" +
+                        level5 + "\n" +
+                        level6 + "\n" +
+                        ave
+                    })
+                  });
+                         
+              country.selectAll("rect")
+                .data(function(d) { return d.levels; })
+                .enter().append("rect")
+                .attr("height", y.rangeBand())
+                .attr("x", function(d) { return x(d.x0); })
+                .attr("width", function(d) { return x(d.x1) - x(d.x0);})
+                .style("fill", function(d) { return color(d.name); });
+              
+               // Adding the line for the OECD overall average score
+              svg.append("line")
+                  .attr("x1", 0)
+                  .attr("y1", y(data[index_ave + 1].Country))
+                  .attr("x2", width)
+                  .attr("y2", y(data[index_ave + 1].Country))
+                  .attr("stroke","red")
+                  .attr("stroke-width", 3)
+                             
+              // Setting up the legend    
+              var fieldnames = ["Level 6: Number of students with score 669.3 and above", "Level 5: lower score limit 607.0", "Level 4: lower score limit 544.7", "Level 3: lower score limit 482.4", "Level 2: lower score limit 420.1", "Level 1: lower score limit 357.8", "Below Level 1", "Average standing across OECD countries"];
+              var colors = ["#ff8c00","#d0743c","#a05d56","#6b486b","#7b6888","#8a89a6","#98abc5","red"];
+
+              var legend = svg.append("g")
+                .attr("class","legend")
+                .attr("transform", "translate(" + (width + 20) + "," + 30 + ")")
+                .selectAll("g")
+                .data(fieldnames)
+                .enter()
+                .append("g");
+
+              // Appending legend symbols to the svg element
+              legend.append("circle")
+                .attr("cy", function(d,i) {
+                  return i * 30;
+                })
+                .attr("r", 5)
+                .attr("fill", function(d,i) {
+                    return colors[i];
+                  });
+
+              // Appending the legend description
+              legend.append("text")
+                .attr("y", function(d,i) {
+                  return i * 30 + 5;
+                })
+                .attr("x", 10)
+                .text(function(d) {
+                  return d;
+                });
+         
+              d3.select("body")
+                .append("h5")
+                .text("Countries are ranked in descending order of the average score.");
+
+              d3.select("body")
+                .append("a")
+                .attr("href","http://www.oecd.org/pisa/pisaproducts/datavisualizationcontest.htm")
+                .text("Source: OECD, PISA 2012");
+
+
+            });
+        </script>
+    </body>
+</html>
