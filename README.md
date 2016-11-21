@@ -31,8 +31,7 @@ One major flaw of stacked bar graphs is that they become harder to read the more
 ### FEEDBACK:
 
 
-Here is a link to my original post to the forum:
-![v_1]( http://bl.ocks.org/daivaSts/raw/599aeae23dec71047bf0b1f000b4150a/)
+Here is a link to my original post to the [forum:](http://bl.ocks.org/daivaSts/raw/599aeae23dec71047bf0b1f000b4150a/)
 
 **OECD average score**
 
@@ -46,7 +45,10 @@ My husband Marius’ concern was that the chart includes countries and economies
 
 **Information on mouseover event**
 
-My friend Asta suggested to change information which appears on mouseover event. Originally it revealed an average score of the country. ![v_2](Screen_Shot.png)
+My friend Asta suggested to change information which appears on mouseover event. Originally it revealed an average score of the country. 
+
+![v_2](Screen_Shot.png)
+
 She pointed out that more interesting information would be the numbers encoded in the colors of the segments. I expanded the text box and added number of students per each level, along with the average score. 
 
 **The size of the chart**
