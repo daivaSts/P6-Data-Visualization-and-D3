@@ -1,5 +1,5 @@
 
-source2 = 'pisa2012.csv'
+source2 = '/Users/daivasatas/Documents/DAND/P6/Final/pisa2012.csv'
 sourse3 = "MS12student_data.csv"
 
 import csv
@@ -13,16 +13,26 @@ data_filter = 'PV1MATH'
 # Country name
 data_country = 'NC'
 
+# 
+happy_filter = 'ST87Q07'
+happiness = None
+
 with open(source2, 'rb') as csvfile1:
     source_reader = csv.DictReader(csvfile1, delimiter=',', quotechar='"')
-   
+
    
     for row in source_reader:
-
+        
+        
     	# creating dictionery entry, where the key is a country, and the value is a list of counts for
     	# each level of scores, total number of students from the coutry, and the total of the averages.
-        result_dict[row[data_country]] = result_dict.get(row[data_country], [0,0,0,0,0,0,0,0,0])
+        result_dict[row[data_country]] = result_dict.get(row[data_country], [0,0,0,0,0,0,0,0,0,0,0])
         result_dict[row[data_country]][8] += 1
+
+        if row[happy_filter] == 'Agree' or row[happy_filter]  == 'Strongly agree':
+            result_dict[row[data_country]][9] += 1
+        else:
+            result_dict[row[data_country]][10] += 1
 
         if float(row[data_filter]) > 669.3:
             result_dict[row[data_country]][6] += 1
@@ -54,14 +64,20 @@ with open(source2, 'rb') as csvfile1:
    
 
 with open(sourse3, 'wb') as csvfile3:
-    fieldnames = ['Country', 'Below Level 1','Level 1','Level 2','Level 3','Level 4','Level 5','Level 6','Average Score']
+    fieldnames = ['Country', 'Below Level 1','Level 1','Level 2','Level 3','Level 4','Level 5','Level 6','Average Score', 'Happiness']
     writer = csv.DictWriter(csvfile3, fieldnames = fieldnames, restval="")
     writer.writeheader()
 
     for key, value in  result_dict.items():
         
+        if value[9] > value[10]:
+            happiness = 1
+        else:
+            happiness = 0
+
         average = value[7] / value[8]
+
         writer.writerow({'Country': key, 'Below Level 1':value[0],'Level 1':value[1],'Level 2':value[2],'Level 3':value[3],
-            'Level 4':value[4],'Level 5':value[5],'Level 6':value[6], 'Average Score': average})
+            'Level 4':value[4],'Level 5':value[5],'Level 6':value[6], 'Average Score': average, 'Happiness': happiness})
 
 
