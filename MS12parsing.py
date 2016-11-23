@@ -10,10 +10,10 @@ result_list = list()
 # Pupil performance in mathematics is coded by plausible values & can be found in columns: PV1MATH
 data_filter = 'PV1MATH'
 
-# Country name
+# Country name filter
 data_country = 'NC'
 
-# 
+# Happiness filter
 happy_filter = 'ST87Q07'
 happiness = None
 

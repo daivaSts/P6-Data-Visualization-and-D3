@@ -29,15 +29,27 @@
               stroke: #000;
               shape-rendering: crispEdges;
             }
-            h2, h3, h4 {
+
+            h2, h3 {
               margin: 2px;
               padding-left: 100px;
+              color: #05228c;
+            }
+
+            h4 {
+              margin: 2px;
+              padding-left: 200px;
+            }
+
+            h5 {
+                margin: 2px;
+                padding-left: 200px;
             }
 
             svg {
               margin: 5px;
             }
-            h5,a {
+            a {
               padding-left: 20px;
             }
 
@@ -45,8 +57,9 @@
               font-size: 16px;
               padding-left: 100px;
             }
+
         </style>
-        <title>P6: Data Visualization and D3</title>
+        <title>Data Visualization and D3</title>
     </head>
     <body>
         <script> 
@@ -56,31 +69,26 @@
 
             d3.select("body")
                 .append("h2")
-                .text("What Countries have the Happiest Students in the World?");
+                .text("ARE MATHEMATICALLY PROFICIENT STUDENTS LESS HAPPY?");
 
             d3.select("body")
                 .append("br");
 
             d3.select("body")
                 .append("p")
-                .text("OECD Program for International Student Assessment (PISA) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students. Around 510 000 students completed the assessment in 2012, representing about 28 million 15-year-olds in the schools of the 65 participating countries and economies.")
+                .text("OECD Program for International Student Assessment (PISA) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students. Around 510,000 students completed the assessment in 2012, representing about 28 million 15-year-olds in the schools of the 65 participating countries and economies.With mathematics as its primary focus, the PISA 2012 assessment measured student capacity to reason mathematically and use mathematical concepts, procedures, facts and tools to describe, explain and predict phenomena. The PISA assessment also included questions about students’ engagement, drive and self-beliefs. Students were asked to agree or disagree with the statement: 'I feel happy at school'.")
 
             d3.select("body")
                 .append("p")
-                .text("With mathematics as its primary focus, the PISA 2012 assessment measured  student capacity to reason mathematically and use mathematical concepts, procedures, facts and tools to describe, explain and predict phenomena. The assesment also included questions about students’ engagement, drive and self-beliefs.");
+                .text("'Are Mathematically Proficient Students Less Happy?' visualizes student performance in mathematics and happiness in school. Happiness was calculated based on the proportion of students who agreed with the statement 'I feel happy at school'. Countries were ranked based on the average math scores. ' Countries where more than 50% of students reported being unhappy are marked in red. The blue line denotes the average mathematical standing across OECD countries. ");
 
             d3.select("body")
                 .append("p")
-                .text("'What Countries have the Happiest Students in the World?'' visualizes the results of student performance in mathematics and happines in school. The best test scores don’t always mean the happiest kids at school.");
-
-
+                .text("The results show a possible correlation between mathematical standing and students’ reported happiness, with 30% of countries above the average and 12% of countries below the average marked as unhappy. The graph does not reveal possible causes for this effect, which may include long hours spent at school, a highly competitive environment, high expectations or pressure to succeed from parents, teachers, society and in general.  Moreover, it may be the case that school work has nothing to do with it and some countries are more likely to report happiness in general. ");
 
             d3.select("body")
-                .append("br");   
-
-            d3.select("body")
-                .append("h3")
-                .text("Percentage of students at each level of mathematics proficiency, 2012");
+                    .append("h5")
+                    .text("Percentage of students at each level of mathematics proficiency");  
 
             var y = d3.scale.ordinal()
                 .rangeRoundBands([0, height], .1);
@@ -98,7 +106,7 @@
 
             var xAxis = d3.svg.axis()
                 .scale(x)
-                .orient("bottom")
+                .orient("top")
                 .tickFormat(d3.format(".0%"));
                 
             var svg = d3.select("body").append("svg")
@@ -106,6 +114,7 @@
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 
             /*
@@ -117,11 +126,15 @@
 
                 // keys - column names
                 color.domain(d3.keys(data[0]).filter(function(key) { 
-                    return key !== "Country" && key !== "Average Score" && key !== "Happiness"; }));
+                    return key !== "Country" &&
+                        key !== "Average Score" &&
+                        key !== "Happy" &&
+                        key !== "Total"; }));
 
                 data.forEach(function(d) {
                     var x0 = 0;
-                    d.levels = color.domain().map(function(name) { return {name: name, x0: x0, x1: x0 += +d[name]};});
+                    d.levels = color.domain().map(function(name) { 
+                        return {name: name, x0: x0, x1: x0 += +d[name]};});
                     d.levels.forEach(function(d) { d.x0 /= x0; d.x1 /= x0; });
                 });
 
@@ -157,12 +170,24 @@
                 svg.append("g")
                     .attr("class", "y axis")
                     .attr("transform", "translate(0,0)")
-                    .call(yAxis);
+                    .call(yAxis) 
+
+                svg.selectAll(".tick")     
+                    .data(data)
+                    .on("mouseover", function(d){ 
+                        d3.select(this)
+                            .append("rect:title")
+                            .text(function(d){
+                                return d.Country + " students" + "\n" +
+                                    "happy with school: " + 
+                                    d3.format("%")(d.Happy/d.Total)
+                            });
+                    });
             
                 
                 svg.append("g")
                     .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
+                    .attr("transform", "translate(0," + 10 + ")")
                     .call(xAxis);
                 
                 var country = svg.selectAll(".country")
@@ -172,21 +197,30 @@
                     .attr("transform", function(d) {
                       return "translate(0," + y(d.Country) + ")";})
                     .on("mouseover", function(d){ 
-                        d3.select(this).append("rect:title")
+                        d3.select(this)
+                        .append("rect:title")
                         .text(function(d) {
+                            var level1b = d3.format("%")(d["Below Level 1"]/d.Total)
+                            var level1 = d3.format("%")(d["Level 1"]/d.Total)
+                            var level2 = d3.format("%")(d["Level 2"]/d.Total)
+                            var level3 = d3.format("%")(d["Level 3"]/d.Total)
+                            var level4 = d3.format("%")(d["Level 4"]/d.Total)
+                            var level5 = d3.format("%")(d["Level 5"]/d.Total)
+                            var level6 = d3.format("%")(d["Level 6"]/d.Total)
+
                             return d.Country + "\n" +
-                                "Number of students: " + "\n" +
-                                "Below level 1: " + d["Below Level 1"] + "\n" +
-                                "Level 1: " + d["Level 1"] + "\n" +
-                                "Level 2: " + d["Level 2"] + "\n" +
-                                "Level 3: " + d["Level 3"] + "\n" +
-                                "Level 4: " + d["Level 4"] + "\n" +
-                                "Level 5: " + d["Level 5"] + "\n" +
-                                "Level 6: " + d["Level 6"] + "\n" +
-                                "Average score: " + Math.floor( d["Average Score"]);
+                                "Students at Level 6: " + level6 + "\n" +
+                                "Level 5: " + level5 + "\n" +
+                                "Level 4: " + level4 + "\n" +
+                                "Level 3: " + level3 + "\n" +
+                                "Level 2: " + level2 + "\n" +
+                                "Level 1: " + level1 + "\n" +
+                                "Below level 1: " + level1b + "\n" +
+                                "Average score: " + Math.floor( d["Average Score"]);                                
                         })
                     });
-                         
+                 
+                // Creating the bar chart         
                 country.selectAll("rect")
                     .data(function(d) { 
                       return d.levels; })
@@ -197,30 +231,37 @@
                     .style("fill", function(d) { return color(d.name); })
 
 
-                // Styling the 'unhappy' country name    
+                // Styling the 'unhappy' country name   
                 svg.selectAll('.y.axis .tick text')
                     .data(data)               
                     .style("font-weight", function(d) {
-                        if (d.Happiness == 0) {
+                        if (d.Happy / d.Total < 0.5) {
                             return 'bold'};})
                     .style("fill", function(d) {
-                        if (d.Happiness == 0) {
-                            return "#e50000"};})
-                 
+                        if (d.Happy / d.Total < 0.5) {
+                            return "#9e0b0b"};})
 
                 // Adding the line for the OECD overall average score
                 svg.append("line")
-                      .attr("x1", 0)
-                      .attr("y1", y(data[index_ave + 1].Country))
-                      .attr("x2", width)
-                      .attr("y2", y(data[index_ave + 1].Country))
-                      .attr("stroke","red")
-                      .attr("stroke-width", 3)
+                    .attr("x1", -130)
+                    .attr("y1", y(data[index_ave + 1].Country))
+                    .attr("x2", width + 10)
+                    .attr("y2", y(data[index_ave + 1].Country))
+                    .attr("stroke","white")
+                    .attr("stroke-width", 4)     
+
+                svg.append("line")
+                    .attr("x1", -130)
+                    .attr("y1", y(data[index_ave + 1].Country))
+                    .attr("x2", width + 10)
+                    .attr("y2", y(data[index_ave + 1].Country))
+                    .attr("stroke","#05228c")
+                    .attr("stroke-width", 2)        
                 
 
                 // Setting up the legend    
-                var fieldnames = ["Level 6: % of students with score 669.3 and above", "Level 5: lower score limit 607.0", "Level 4: lower score limit 544.7", "Level 3: lower score limit 482.4", "Level 2: lower score limit 420.1", "Level 1: lower score limit 357.8", "Below Level 1", "Average standing across OECD countries","Country names with more than a half unhappy students"];
-                var colors = ["#ff8c00","#d0743c","#a05d56","#6b486b","#7b6888","#8a89a6","#98abc5","red","#e50000"];
+                var fieldnames = ["Countries with more than a half unhappy students","Average math score across OECD countries", ," Levels of Proficiency in PISA 2012:","Level 6: Students with score 669.3 and above", "Level 5: lower score limit 607.0", "Level 4: lower score limit 544.7", "Level 3: lower score limit 482.4", "Level 2: lower score limit 420.1", "Level 1: lower score limit 357.8", "Below Level 1"];
+                var colors = ["#9e0b0b","white",'white','white',"#ff8c00","#d0743c","#a05d56","#6b486b","#7b6888","#8a89a6","#98abc5"];
 
                 var legend = svg.append("g")
                     .attr("class","legend")
@@ -238,6 +279,16 @@
                     .attr("fill", function(d,i) {
                         return colors[i];});
 
+
+                // Appending legend symbols to the svg element
+                legend.append("rect")
+                  .attr('width', 12)
+                  .attr('height', 3)
+                  .style('fill', '#05228c')
+                  .attr("transform","translate(-5,28)")
+     
+
+
                 // Appending the legend description
                 legend.append("text")
                     .attr("y", function(d,i) {
@@ -245,10 +296,7 @@
                     .attr("x", 10)
                     .text(function(d) {
                         return d;});
-         
-                d3.select("body")
-                    .append("h5")
-                    .text("Countries are ranked in descending order of the average score.");
+ 
 
                 d3.select("body")
                     .append("a")
