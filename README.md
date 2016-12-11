@@ -1,4 +1,4 @@
-### Udacity / Data Analyst Nanodegree 11'2016
+### Udacity.com / Data Analyst Nanodegree 11'2016
 ### P6: Data Visualization and D3.js
 
 
@@ -10,20 +10,21 @@ For the final project, the goal is to create a data visualization from a data se
 
 Clone project or download project's zip folder to your computer.
 Open index.html file in your browser. 
-Please note: Do not run python file to parse the original data. It is not provided, since the size is 2.75GB. It can be found [here](https://www.oecd.org/pisa/pisaproducts/pisa2012database-downloadabledata.htm)
+Please note: Do not run python file to parse the original data. It is not provided, since the size is 2.75GB. Data can be found [here](https://www.oecd.org/pisa/pisaproducts/pisa2012database-downloadabledata.htm)
 
 #### DATA EXPLORATION:
 
 OECD Program for International Student Assessment (PISA) is a triennial international survey which aims to evaluate education systems worldwide by testing the skills and knowledge of 15-year-old students. Around 510,000 students completed the assessment in 2012, representing about 28 million 15-year-olds in the schools of the 65 participating countries and economies.With mathematics as its primary focus, the PISA 2012 assessment measured student capacity to reason mathematically and use mathematical concepts, procedures, facts and tools to describe, explain and predict phenomena. The PISA assessment also included questions about students’ engagement, drive and self-beliefs. Students were asked to agree or disagree with the statement: 'I feel happy at school'.
+
 
 #### DATA SOURCE: http://www.oecd.org/pisa/
 #### DATA LICENSE: http://www.oecd.org/pisa/47307726.pdf
 
 #### EXPLANATORY ANALYSIS:
 
-'Are Mathematically Proficient Students Less Happy?' visualizes student performance in mathematics and happiness in school. Happiness was calculated based on the proportion of students who agreed with the statement 'I feel happy at school'. Countries were ranked based on the average math scores. ' 
+'Are Mathematically Proficient Students Less Happy?' visualizes student performance in mathematics and happiness in school. Happiness was calculated based on the proportion of students who agreed with the statement 'I feel happy at school'. Countries were ranked based on the average math scores. ' Countries where more than 50% of students reported being unhappy are marked in red. The blue line denotes the average mathematical standing across OECD countries. 
 
-The results show a possible correlation between mathematical standing and students’ reported happiness, with …% of countries above the average and …% of countries below the average marked as unhappy. The graph does not reveal possible causes for this effect, which may include long hours spent at school, a highly competitive environment, high expectations or pressure to succeed from parents, teachers, society and in general.  Moreover, it may be the case that school work has nothing to do with it and some countries are more likely to report happiness in general. 
+The results show a possible correlation between mathematical standing and students’ reported happiness, with 30% of countries above the average and 12% of countries below the average marked as unhappy. The graph does not reveal possible causes for this effect, which may include long hours spent at school, a highly competitive environment, high expectations or pressure to succeed from parents, teachers, society and in general.  Moreover, it may be the case that school work has nothing to do with it and some countries are more likely to report happiness in general. 
 
 
 #### DESIGN:
@@ -54,7 +55,7 @@ He was absolutely correct to point that out. I changed the wording to more speci
 
 **Fair data?**
 
-My husband Marius’ concern was that the chart includes countries and economies. For example: China (Shanghai), Chinese Taipei, Macao-China, also Perm (Russian Federation) and Russian Federation. His point was that it is not fair to some countries, which might also have regions with possible better education levels. After the verification of the legal status of these regions, I have decided to combine the data and show as one country data point.
+Another concern was that the chart includes countries and economies. For example: China (Shanghai), Chinese Taipei, Macao-China, also Perm (Russian Federation) and Russian Federation. His point was that it is not fair to some countries, which might also have regions with possible better education levels. After the verification of the legal status of these regions, I have decided to combine the data and show as one country data point.
 
 **Information on mouseover event**
 
